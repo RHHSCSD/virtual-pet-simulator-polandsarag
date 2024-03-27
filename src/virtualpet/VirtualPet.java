@@ -176,7 +176,7 @@ public class VirtualPet {
             
             //Determine pet stats 
             petMaxHealth = rd.nextInt(17)+1;
-            petMaxFood = rd.nextInt((totalPetStats-petMaxHealth))+1;
+            petMaxFood = rd.nextInt((totalPetStats-petMaxHealth-1))+1;
             petMaxEnergy = totalPetStats - petMaxHealth - petMaxFood;        
             System.out.println("Your max health is "+petMaxHealth+", your max food is "+petMaxFood+", and your max energy is "+petMaxEnergy);
         }
