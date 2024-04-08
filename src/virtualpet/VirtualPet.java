@@ -37,15 +37,17 @@ public class VirtualPet {
 
         //For pet stats 
         final int TOTALPETSTATS = 20;
-        final int LUMPSMULTIPLIERGUESS = 3;
 
         //For game 1 
         final int GUESSMAX = 5;
+        final int LUMPSMULTIPLIERGUESS = 3;
 
         //For game 2 
         final String MATCHINGTILES = "ABCDE";
         final int TILENUMBER = 10;
         final int TRIESMAX = 7;
+        final int CORRECTWINS = 5;
+        final int LUMPSMAXTILES = 20;
 
         //VARIABLES// 
         boolean startMenu = false;
@@ -83,6 +85,7 @@ public class VirtualPet {
         int indexMatch2 = 0;
         int randomTile = 0;
         char addedTile = ' ';
+        int correctGuess = 0; 
 
         // Start screen setup 
         System.out.println("""
@@ -254,8 +257,8 @@ public class VirtualPet {
 
                         //If guess is correct
                         if (guessedNumber == randomGuess) {
-                            System.out.println("Congrats, your guess was correct! You now have " + lumps + " lumps :P");
                             lumps += GUESSMAX * LUMPSMULTIPLIERGUESS - guessTimes * LUMPSMULTIPLIERGUESS;
+                            System.out.println("Congrats, your guess was correct! You now have " + lumps + " lumps :P");                            
                             break;
                         }
 
@@ -289,11 +292,38 @@ public class VirtualPet {
                             tile++;
                         }
                     }
-
+                    
+                    //Print out intial shown tiles 
+                    System.out.println(shownTiles);
+                    
+                    //Set up system for guessing 
                     for (int tries = 0; tries < TRIESMAX; tries++) {
-                        System.out.println("Input your first and second index, 1 on each line");
+                        System.out.println("Input your first and second position (starting from index 0), 1 on each line");
                         indexMatch1 = kb.nextInt();
                         indexMatch2 = kb.nextInt();
+                        
+                        //Print out guessed tiles 
+                        shownTiles = "";
+                        for (int tileX = 0; tileX < TILENUMBER; tileX++) {
+                            if ((tileX == indexMatch1) || (tileX == indexMatch2)) {
+                                 shownTiles = shownTiles + tiles.charAt(tileX); 
+                            }
+                            else {
+                                shownTiles += "X";
+                            }
+                        }
+                        System.out.println(shownTiles);
+                        
+                        if (tiles.charAt(indexMatch1)==tiles.charAt(indexMatch2)) {
+                            System.out.println("You've matched 2 tiles!");
+                        }
+                        
+                        
+                        if (correctGuess == CORRECTWINS) {
+                            lumps += LUMPSMAXTILES - (tries-5)*4;
+                            System.out.println("You win!! You now have "+lumps+" lumps.");                            
+                            break; 
+                        }
                     }
 
                 } else if (playGame == 3) {
