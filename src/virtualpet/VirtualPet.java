@@ -45,7 +45,7 @@ public class VirtualPet {
         //For game 2 
         final String MATCHINGTILES = "ABCDE";
         final int TILENUMBER = 10;
-        final int TRIESMAX = 7;
+        final int TRIESMAX = 10;
         final int CORRECTWINS = 5;
         final int LUMPSMAXTILES = 20;
 
@@ -86,6 +86,13 @@ public class VirtualPet {
         int randomTile = 0;
         char addedTile = ' ';
         int correctGuess = 0; 
+        boolean tilesWin = false; 
+        String matchedTiles = "";
+        String matchedTilesCopy = "";
+        
+        for (int tileMatch = 0; tileMatch <TILENUMBER; tileMatch++) {
+        matchedTiles += "F";
+        }
 
         // Start screen setup 
         System.out.println("""
@@ -286,10 +293,10 @@ public class VirtualPet {
                     }
                     while (tile < TILENUMBER) {
                         randomTile = rd.nextInt(TILENUMBER / 2);
-                        addedTile = MATCHINGTILES.charAt(randomTile);
+                        addedTile = MATCHINGTILES.charAt(randomTile);   
                         if (tiles.indexOf(addedTile) == tiles.lastIndexOf(addedTile)) {
                             tiles += addedTile;
-                            tile++;
+                            tile++; 
                         }
                     }
                     
@@ -305,8 +312,8 @@ public class VirtualPet {
                         //Print out guessed tiles 
                         shownTiles = "";
                         for (int tileX = 0; tileX < TILENUMBER; tileX++) {
-                            if ((tileX == indexMatch1) || (tileX == indexMatch2)) {
-                                 shownTiles = shownTiles + tiles.charAt(tileX); 
+                            if ((tileX == indexMatch1) || (tileX == indexMatch2) || (matchedTiles.charAt(tileX) == 'T')) {
+                                 shownTiles += tiles.charAt(tileX); 
                             }
                             else {
                                 shownTiles += "X";
@@ -314,17 +321,52 @@ public class VirtualPet {
                         }
                         System.out.println(shownTiles);
                         
-                        if (tiles.charAt(indexMatch1)==tiles.charAt(indexMatch2)) {
+                        if ((tiles.charAt(indexMatch1)==tiles.charAt(indexMatch2))&& (matchedTiles.charAt(indexMatch1)=='F') && (matchedTiles.charAt(indexMatch2)=='F') ) {
                             System.out.println("You've matched 2 tiles!");
+                            matchedTilesCopy = matchedTiles;
+                            matchedTiles = "";
+                            for (int tileMatch = 0; tileMatch < TILENUMBER; tileMatch++) {
+                                if (tileMatch == indexMatch1 || tileMatch == indexMatch2 || matchedTilesCopy.charAt(tileMatch)=='T'){
+                                    matchedTiles += "T";
+                                }
+                                else {
+                                    matchedTiles += "F";
+                                }
+                            }
+                            correctGuess++;
+                        }
+                        else if ((matchedTiles.charAt(indexMatch1)=='T') && (matchedTiles.charAt(indexMatch2)=='T')) {
+                            System.out.println("You've already selected this pair!");
+                        }
+                        else {
+                            System.out.println("Incorrect!");
                         }
                         
                         
                         if (correctGuess == CORRECTWINS) {
                             lumps += LUMPSMAXTILES - (tries-5)*4;
-                            System.out.println("You win!! You now have "+lumps+" lumps.");                            
+                            System.out.println("You win!! You now have "+lumps+" lumps.");   
+                            tilesWin = true; 
                             break; 
                         }
                     }
+                if (tilesWin == false) {
+                    System.out.println("You lost! The string looked like this: "+tiles);
+                }
+                
+                shownTiles = "";
+                tiles = "";
+                tilesWin = false;
+                correctGuess = 0; 
+                tilesWin = false; 
+                matchedTiles = "";
+                matchedTilesCopy = "";
+                tile = 0;
+                
+                for (int tileMatch = 0; tileMatch <TILENUMBER; tileMatch++) {
+                    matchedTiles += "F";
+                }
+                
 
                 } else if (playGame == 3) {
 
