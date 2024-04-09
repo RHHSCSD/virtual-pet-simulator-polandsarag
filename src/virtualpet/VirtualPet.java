@@ -14,9 +14,47 @@ import java.util.*;
  */
 public class VirtualPet {
 
-    /**
-     * @param args the command line arguments
-     */
+    //METHODS 
+    public static boolean correctLogin(String username, String password, String realUsername, String realPassword) {
+        boolean loggedIn = false;
+        if (username.equals(realUsername) && password.equals(realPassword)) {
+            loggedIn = true;
+        }
+        return loggedIn;
+    }
+
+    public static String nameGenerator(int nameLength, int doubleVowelMaxLength, String consonants, String vowels) {
+        Random rd = new Random();
+        String petName = "";
+        char petVowel = ' ';
+        for (int nameIndex = 0; nameIndex < (nameLength); nameIndex++) {
+            //If pet name hasn't reached full length
+            if (petName.length() < nameLength) {
+                //Every other letter is consonant 
+                if (nameIndex % 2 == 0) {
+                    petName = petName + consonants.charAt(rd.nextInt(21));
+
+                    //If first letter in name 
+                    if (nameIndex == 0) {
+                        petName = petName.toUpperCase();
+                    }
+                } //Every other letter is vowel 
+                else {
+                    petVowel = vowels.charAt(rd.nextInt(5));
+
+                    //1 in 5 chance of having double vowels if doesn't exceed name length
+                    if (rd.nextInt(4) == 0 && petName.length() <= doubleVowelMaxLength) {
+                        petName = petName + petVowel + petVowel;
+                    } //Otherwise Single vowel
+                    else {
+                        petName = petName + petVowel;
+                    }
+                }
+            }
+        }
+        return petName;
+    }
+
     public static void main(String[] args) {
 
         //SCANNER & RANDOM//
@@ -70,6 +108,10 @@ public class VirtualPet {
         int petMaxHealth = 0;
         int petMaxFood = 0;
         int petMaxEnergy = 0;
+
+        int petHealth = 0;
+        int petFood = 0;
+        int petEnergy = 0;
         int lumps = 0;
 
         //For playing game 1 
@@ -85,13 +127,13 @@ public class VirtualPet {
         int indexMatch2 = 0;
         int randomTile = 0;
         char addedTile = ' ';
-        int correctGuess = 0; 
-        boolean tilesWin = false; 
+        int correctGuess = 0;
+        boolean tilesWin = false;
         String matchedTiles = "";
         String matchedTilesCopy = "";
-        
-        for (int tileMatch = 0; tileMatch <TILENUMBER; tileMatch++) {
-        matchedTiles += "F";
+
+        for (int tileMatch = 0; tileMatch < TILENUMBER; tileMatch++) {
+            matchedTiles += "F";
         }
 
         // Start screen setup 
@@ -126,49 +168,41 @@ public class VirtualPet {
                                                                                                             """);
 
         //Login Menu 
-        for (int tryNumber = 0; tryNumber < LOGINATTEMPTS; tryNumber++) {
+        while (startMenu == false) {
             System.out.println("Enter your username:");
             username = kb.nextLine();
             System.out.println("Enter your password: ");
             password = kb.nextLine();
 
-            //If username and password are correct, open menu
-            if (username.equals(PETUSER) && password.equals(PETPASSWORD)) {
-                startMenu = true;
-                break;
-            } //If invalid username / password 
-            else {
-                System.out.print("Invalid input. ");
-                if (tryNumber == 2) {
-                    System.out.println("Exiting ...");
-                    System.exit(0);
-                } else {
-                    System.out.println("Try again. ");
-                }
+            startMenu = correctLogin(username, password, PETUSER, PETPASSWORD);
+
+            //If invalid username / password 
+            if (startMenu == false) {
+                System.out.println("Invalid input. Try again.");
             }
         }
+
+        System.out.println("Successful login! Please select an option from the menu: ");
 
         while (startMenu == true) {
             //START MENU//
 
             //First time start menu 
             if (generatePet == false) {
-
                 System.out.println("""
                            1. START 
                            2. INSTRUCTIONS 
                            3. END 
                            """);
-                startScreenOption = kb.nextInt();
             } else {
-
                 System.out.println("""
                            1. PLAY/INTERACT
                            2. INSTRUCTIONS 
                            3. END 
                            """);
-                startScreenOption = kb.nextInt();
             }
+
+            startScreenOption = kb.nextInt();
 
             //Determine what to do on start menu
             //If pet not generated yet 
@@ -198,36 +232,11 @@ public class VirtualPet {
                 //Input a pets name 
                 if (naming == 1) {
                     System.out.println("Enter your pet's name: ");
-                    petName = kb.nextLine();
-                    petName = kb.nextLine();
+                    petName = kb.nextLine(); //To clear cache
+                    petName = kb.nextLine(); //Actual input of name
                 } //Generating a pets name 
                 else if (naming == 2) {
-                    for (int nameIndex = 0; nameIndex < (PETNAMEMAXLENGTH - rd.nextInt(4)); nameIndex++) {
-
-                        //If pet name 
-                        if (petName.length() < PETNAMEMAXLENGTH) {
-                            //Every other letter is consonant 
-                            if (nameIndex % 2 == 0) {
-                                petName = petName + CONSONANTS.charAt(rd.nextInt(21));
-
-                                //If first letter in name 
-                                if (nameIndex == 0) {
-                                    petName = petName.toUpperCase();
-                                }
-                            } //Every other letter is vowel 
-                            else {
-                                petVowel = VOWELS.charAt(rd.nextInt(5));
-
-                                //1 in 5 chance of having double vowels if doesn't exceed name length
-                                if (rd.nextInt(4) == 0 && petName.length() <= DOUBLEVOWELLENGTH) {
-                                    petName = petName + petVowel + petVowel;
-                                } //Otherwise Single vowel
-                                else {
-                                    petName = petName + petVowel;
-                                }
-                            }
-                        }
-                    }
+                    petName = nameGenerator((PETNAMEMAXLENGTH - (rd.nextInt(4))), DOUBLEVOWELLENGTH, CONSONANTS, VOWELS);
                 } //Invalid input for inputting name 
                 else {
                     System.out.println("Invalid input ");
@@ -265,7 +274,7 @@ public class VirtualPet {
                         //If guess is correct
                         if (guessedNumber == randomGuess) {
                             lumps += GUESSMAX * LUMPSMULTIPLIERGUESS - guessTimes * LUMPSMULTIPLIERGUESS;
-                            System.out.println("Congrats, your guess was correct! You now have " + lumps + " lumps :P");                            
+                            System.out.println("Congrats, your guess was correct! You now have " + lumps + " lumps :P");
                             break;
                         }
 
@@ -291,82 +300,91 @@ public class VirtualPet {
                     for (int tileX = 0; tileX < TILENUMBER; tileX++) {
                         shownTiles += "X";
                     }
+
+                    //Create the list of actual tiles needed to guess 
                     while (tile < TILENUMBER) {
+                        //Generate numbers from 0-4, and then pick random vowel using number 
                         randomTile = rd.nextInt(TILENUMBER / 2);
-                        addedTile = MATCHINGTILES.charAt(randomTile);   
+                        addedTile = MATCHINGTILES.charAt(randomTile);
+
+                        //If first & last position of certain letter is the same (meaning either one or no occurences), add the letter
                         if (tiles.indexOf(addedTile) == tiles.lastIndexOf(addedTile)) {
                             tiles += addedTile;
-                            tile++; 
+                            tile++;
                         }
                     }
-                    
+
                     //Print out intial shown tiles 
                     System.out.println(shownTiles);
-                    
+
                     //Set up system for guessing 
                     for (int tries = 0; tries < TRIESMAX; tries++) {
                         System.out.println("Input your first and second position (starting from index 0), 1 on each line");
                         indexMatch1 = kb.nextInt();
                         indexMatch2 = kb.nextInt();
-                        
-                        //Print out guessed tiles 
+
+                        //Remake shown tiles, with both the inputted tiles and tiles that are already found 
                         shownTiles = "";
                         for (int tileX = 0; tileX < TILENUMBER; tileX++) {
                             if ((tileX == indexMatch1) || (tileX == indexMatch2) || (matchedTiles.charAt(tileX) == 'T')) {
-                                 shownTiles += tiles.charAt(tileX); 
-                            }
-                            else {
+                                shownTiles += tiles.charAt(tileX);
+                            } else {
                                 shownTiles += "X";
                             }
                         }
+
+                        //Print shown tiles 
                         System.out.println(shownTiles);
-                        
-                        if ((tiles.charAt(indexMatch1)==tiles.charAt(indexMatch2))&& (matchedTiles.charAt(indexMatch1)=='F') && (matchedTiles.charAt(indexMatch2)=='F') ) {
+
+                        //If the two tiles are the same and has not been found yet 
+                        if ((tiles.charAt(indexMatch1) == tiles.charAt(indexMatch2)) && (matchedTiles.charAt(indexMatch1) == 'F') && (matchedTiles.charAt(indexMatch2) == 'F')) {
                             System.out.println("You've matched 2 tiles!");
                             matchedTilesCopy = matchedTiles;
                             matchedTiles = "";
+
+                            //Create a new matchedTiles which holds whether the tile has been paired or not 
                             for (int tileMatch = 0; tileMatch < TILENUMBER; tileMatch++) {
-                                if (tileMatch == indexMatch1 || tileMatch == indexMatch2 || matchedTilesCopy.charAt(tileMatch)=='T'){
+                                if (tileMatch == indexMatch1 || tileMatch == indexMatch2 || matchedTilesCopy.charAt(tileMatch) == 'T') {
                                     matchedTiles += "T";
-                                }
-                                else {
+                                } else {
                                     matchedTiles += "F";
                                 }
                             }
                             correctGuess++;
-                        }
-                        else if ((matchedTiles.charAt(indexMatch1)=='T') && (matchedTiles.charAt(indexMatch2)=='T')) {
+                        } //If the user already selected the pair 
+                        else if ((matchedTiles.charAt(indexMatch1) == 'T') && (matchedTiles.charAt(indexMatch2) == 'T')) {
                             System.out.println("You've already selected this pair!");
-                        }
-                        else {
+                        } else {
                             System.out.println("Incorrect!");
                         }
-                        
-                        
+
+                        //If the user guesses all the pairs, give them corresponding number of lumps 
                         if (correctGuess == CORRECTWINS) {
-                            lumps += LUMPSMAXTILES - (tries-5)*4;
-                            System.out.println("You win!! You now have "+lumps+" lumps.");   
-                            tilesWin = true; 
-                            break; 
+                            lumps += LUMPSMAXTILES - (tries - 5) * 4;
+                            System.out.println("You win!! You now have " + lumps + " lumps.");
+                            tilesWin = true;
+                            break;
                         }
                     }
-                if (tilesWin == false) {
-                    System.out.println("You lost! The string looked like this: "+tiles);
-                }
-                
-                shownTiles = "";
-                tiles = "";
-                tilesWin = false;
-                correctGuess = 0; 
-                tilesWin = false; 
-                matchedTiles = "";
-                matchedTilesCopy = "";
-                tile = 0;
-                
-                for (int tileMatch = 0; tileMatch <TILENUMBER; tileMatch++) {
-                    matchedTiles += "F";
-                }
-                
+
+                    //If user runs out of guesses 
+                    if (tilesWin == false) {
+                        System.out.println("You lost! The string looked like this: " + tiles);
+                    }
+
+                    //Reset all variables used in game 2 
+                    shownTiles = "";
+                    tiles = "";
+                    tilesWin = false;
+                    correctGuess = 0;
+                    tilesWin = false;
+                    matchedTiles = "";
+                    matchedTilesCopy = "";
+                    tile = 0;
+
+                    for (int tileMatch = 0; tileMatch < TILENUMBER; tileMatch++) {
+                        matchedTiles += "F";
+                    }
 
                 } else if (playGame == 3) {
 
