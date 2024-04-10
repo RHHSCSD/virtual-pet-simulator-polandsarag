@@ -5,6 +5,7 @@
 package virtualpet;
 
 import java.util.*;
+import javax.swing.JOptionPane; 
 
 /**
  * Program: Virtual Pet Simulator
@@ -12,6 +13,7 @@ import java.util.*;
  * @author Sarah Cui Start date: 03/18/2024
  *
  */
+
 public class VirtualPet {
 
     //METHODS 
@@ -169,65 +171,60 @@ public class VirtualPet {
 
         //Login Menu 
         while (startMenu == false) {
-            System.out.println("Enter your username:");
-            username = kb.nextLine();
-            System.out.println("Enter your password: ");
-            password = kb.nextLine();
+            username = JOptionPane.showInputDialog(null, "Enter your username:");
+            password = JOptionPane.showInputDialog(null, "Enter your password:");
 
             startMenu = correctLogin(username, password, PETUSER, PETPASSWORD);
 
             //If invalid username / password 
             if (startMenu == false) {
-                System.out.println("Invalid input. Try again.");
+                JOptionPane.showMessageDialog(null, "Invalid input. Try again.");
             }
         }
 
-        System.out.println("Successful login! Please select an option from the menu: ");
+        JOptionPane.showMessageDialog(null, "Successful login! Please select an option from the menu: ");
 
         while (startMenu == true) {
             //START MENU//
 
             //First time start menu 
             if (generatePet == false) {
-                System.out.println("""
+                startScreenOption = Integer.parseInt(JOptionPane.showInputDialog(null, """
                            1. START 
                            2. INSTRUCTIONS 
                            3. END 
-                           """);
+                           """));
             } else {
-                System.out.println("""
+                startScreenOption = Integer.parseInt(JOptionPane.showInputDialog(null, """
                            1. PLAY/INTERACT
                            2. INSTRUCTIONS 
                            3. END 
-                           """);
+                           """));
             }
-
-            startScreenOption = kb.nextInt();
 
             //Determine what to do on start menu
             //If pet not generated yet 
             if ((startScreenOption == 1) && (generatePet == false)) {
 
                 //Choose Shark
-                System.out.println("CHOOSE YOUR SHARK: \n HAMMERHEAD SHARK (1) \n BASKING SHARK (2) \n WHALE SHARK (3)");
-                sharkChoice = kb.nextInt();
+                sharkChoice = Integer.parseInt(JOptionPane.showInputDialog(null, "CHOOSE YOUR SHARK: \n HAMMERHEAD SHARK (1) \n BASKING SHARK (2) \n WHALE SHARK (3)"));
                 if (1 <= sharkChoice && sharkChoice <= 3) {
                     switch (sharkChoice) {
                         case 1:
-                            System.out.println("CONFIRM HAMMERHEAD SHARK");
+                            JOptionPane.showMessageDialog(null, "CONFIRM HAMMERHEAD SHARK");
                             break;
                         case 2:
-                            System.out.println("CONFIRM BASKING SHARK");
+                            JOptionPane.showMessageDialog(null, "CONFIRM BASKING SHARK");
                             break;
                         case 3:
-                            System.out.println("CONFIRM WHALE SHARK");
+                            JOptionPane.showMessageDialog(null, "CONFIRM WHALE SHARK");
                             break;
                     }
                 }
 
                 //Determine whether to input name or generate random name 
                 System.out.println("Would you like to input a name (1) or generate a name (2)?");
-                naming = kb.nextInt();
+                naming = Integer.parseInt(JOptionPane.showInputDialog(null, "Would you like to input a name (1) or generate a name (2)?"));
 
                 //Input a pets name 
                 if (naming == 1) {
@@ -402,8 +399,7 @@ public class VirtualPet {
                 System.exit(0);
             } //If invalid input for start menu
             else {
-                System.out.println("Invalid input");
-                return;
+                System.out.println("Invalid input. Please try again.");
             }
         }
 
