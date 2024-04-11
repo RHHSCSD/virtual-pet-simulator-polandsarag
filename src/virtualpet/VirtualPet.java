@@ -389,29 +389,32 @@ public class VirtualPet {
 
                 } else if (playGame == 3) {
                     petAction = Integer.parseInt(JOptionPane.showInputDialog(null, "Would you like to play with your pet (1), feed your pet (2), groom your pet(3), or exit out of interaction (4)?"));
-                    if (petAction == 1) {
-                        if (petEnergy < petMaxEnergy){
-                            
-                        }
-                        else {
-                            System.out.println("Pet energy already maxed!");
-                        }
-                    } else if (petAction == 2) {
-                        if (petFood < petMaxFood) {
-
-                        } else {
-                            System.out.println("Pet hunger already maxed!");
-                        }
-                    } else if (petAction == 3) {
-                        if (petHealth < petMaxHealth) {
-
-                        } else {
-                            System.out.println("Pet heealth already maxed!");
-                        }
-                    } else if (petAction == 4) {
-                        System.out.println("Leaving interaction menu...");
-                    } else {
-                        System.out.println("Invalid input.");
+                    switch (petAction) {
+                        case 1:
+                            if (petEnergy < petMaxEnergy){
+                                
+                            }
+                            else {
+                                System.out.println("Pet energy already maxed!");
+                            }   break;
+                        case 2:
+                            if (petFood < petMaxFood) {
+                                
+                            } else {
+                                System.out.println("Pet hunger already maxed!");
+                            }   break;
+                        case 3:
+                            if (petHealth < petMaxHealth) {
+                                
+                            } else {
+                                System.out.println("Pet heealth already maxed!");
+                            }   break;
+                        case 4:
+                            System.out.println("Leaving interaction menu...");
+                            break;
+                        default:
+                            System.out.println("Invalid input.");
+                            break;
                     }
 
                 } else {
