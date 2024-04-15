@@ -22,6 +22,13 @@ public class VirtualPet {
     final static int CORRECTWINS = 5;
     final static int LUMPSMAXTILES = 24;
 
+    //For pet interaction 
+    final static int TOYWORTH = 4;
+    final static int FOODWORTH = 4;
+    final static int GROOMWORTH = 4;
+
+    static int lumps = 0;
+
     //METHODS//
     //Method to check if correct login 
     public static boolean correctLogin(String username, String password, String realUsername, String realPassword) {
@@ -66,7 +73,7 @@ public class VirtualPet {
     }
 
     //To play game 2
-    public static int matchingGame(int lumps) {
+    public static void matchingGame() {
 
         //Scanner and random 
         Scanner kb = new Scanner(System.in);
@@ -159,7 +166,6 @@ public class VirtualPet {
                 lumps += LUMPSMAXTILES - (tries - 5) * 4;
                 System.out.println("You win!! You now have " + lumps + " lumps.");
                 tilesWin = true;
-                return lumps;
             }
         }
 
@@ -167,7 +173,54 @@ public class VirtualPet {
         if (tilesWin == false) {
             System.out.println("You lost! The string looked like this: " + tiles);
         }
-        return lumps = 0;
+    }
+
+    //PET INTERACTION METHODS// 
+    public static int petPlay(int maxEnergy, int petEnergy) {
+        int newEnergy = petEnergy;
+        String toyChoice = JOptionPane.showInputDialog(null, "Would you like to buy a toy for 1 lump?");
+        if (toyChoice.equalsIgnoreCase("Yes")) {
+            lumps -= 1;
+            JOptionPane.showMessageDialog(null, "You give a toy to your pet. \n The shark chews up the toy, leaving a pile of scraps left.");
+            if ((petEnergy + TOYWORTH) <= maxEnergy) {
+                newEnergy += TOYWORTH;
+            } else {
+                newEnergy = maxEnergy;
+            }
+            JOptionPane.showMessageDialog(null, "Your pet now has " + newEnergy + " energy!");
+        }
+        return newEnergy;
+    }
+
+    public static int petFeed(int maxFood, int petFood) {
+        int newFood = petFood;
+        String foodChoice = JOptionPane.showInputDialog(null, "Would you like to buy food for 1 lump?");
+        if (foodChoice.equalsIgnoreCase("Yes")) {
+            lumps -= 1;
+            JOptionPane.showMessageDialog(null, "You give some fish to your pet. \n The shark instantly devours the fish, and appears very content. ");
+            if ((petFood + FOODWORTH) <= maxFood) {
+                newFood += FOODWORTH;
+            } else {
+                newFood = maxFood;
+            }
+            JOptionPane.showMessageDialog(null, "Your pet now has " + newFood + " hunger!");
+        }
+        return newFood;
+    }
+
+    public static int petGroom(int maxHealth, int petHealth) {
+        int newHealth = petHealth;
+        String toyChoice = JOptionPane.showInputDialog(null, "Would you like to pet your shark?");
+        if (toyChoice.equalsIgnoreCase("Yes")) {
+            JOptionPane.showMessageDialog(null, "You stroke the back of your shark. It begins swimming in laps, evidently happy with being pet. ");
+            if ((petHealth + GROOMWORTH) <= maxHealth) {
+                newHealth += GROOMWORTH;
+            } else {
+                newHealth = maxHealth;
+            }
+            JOptionPane.showMessageDialog(null, "Your pet now has " + newHealth + " health!");
+        }
+        return newHealth;
     }
 
     //MAIN METHOD// 
@@ -209,9 +262,6 @@ public class VirtualPet {
         //For naming
         int naming = 0;
         String petName = "";
-        char nameConsonant = ' ';
-        char nameVowel = ' ';
-        char petVowel = ' ';
 
         //For stats 
         int petMaxHealth = 0;
@@ -221,7 +271,6 @@ public class VirtualPet {
         int petHealth = 0;
         int petFood = 0;
         int petEnergy = 0;
-        int lumps = 0;
 
         //For playing game 1 
         int playGame = 0;
@@ -341,6 +390,9 @@ public class VirtualPet {
                 petMaxFood = rd.nextInt((TOTALPETSTATS - petMaxHealth - 1)) + 1;
                 petMaxEnergy = TOTALPETSTATS - petMaxHealth - petMaxFood;
                 System.out.println("Your max health is " + petMaxHealth + ", your max food is " + petMaxFood + ", and your max energy is " + petMaxEnergy);
+                petHealth = petMaxHealth;
+                petFood = petMaxFood;
+                petEnergy = petMaxEnergy;
 
                 //Allow interaction with pet 
                 generatePet = true;
@@ -384,31 +436,32 @@ public class VirtualPet {
 
                     //Play the Matching Game 
                 } else if (playGame == 2) {
-
-                    lumps += matchingGame(lumps);
+                    matchingGame();
 
                 } else if (playGame == 3) {
                     petAction = Integer.parseInt(JOptionPane.showInputDialog(null, "Would you like to play with your pet (1), feed your pet (2), groom your pet(3), or exit out of interaction (4)?"));
                     switch (petAction) {
                         case 1:
-                            if (petEnergy < petMaxEnergy){
-                                
-                            }
-                            else {
+                            if (petEnergy < petMaxEnergy) {
+                                petPlay(petMaxEnergy, petEnergy);
+                            } else {
                                 System.out.println("Pet energy already maxed!");
-                            }   break;
+                            }
+                            break;
                         case 2:
                             if (petFood < petMaxFood) {
-                                
+                                petFeed(petMaxFood, petFood);
                             } else {
                                 System.out.println("Pet hunger already maxed!");
-                            }   break;
+                            }
+                            break;
                         case 3:
                             if (petHealth < petMaxHealth) {
-                                
+                                petGroom(petMaxHealth, petHealth);
                             } else {
                                 System.out.println("Pet heealth already maxed!");
-                            }   break;
+                            }
+                            break;
                         case 4:
                             System.out.println("Leaving interaction menu...");
                             break;
