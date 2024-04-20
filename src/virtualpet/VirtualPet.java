@@ -5,13 +5,13 @@
 package virtualpet;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.JOptionPane;
 
 /**
  * Program: Virtual Pet Simulator
  *
  * @author Sarah Cui Start date: 03/18/2024
- *
  */
 public class VirtualPet {
 
@@ -31,10 +31,45 @@ public class VirtualPet {
 
     //METHODS//
     //Method to check if correct login 
-    public static boolean correctLogin(String username, String password, String realUsername, String realPassword) {
+    public static boolean correctLogin(String username, String password) {
+        //Create variables 
         boolean loggedIn = false;
-        if (username.equals(realUsername) && password.equals(realPassword)) {
-            loggedIn = true;
+        File f = new File(username + ".txt");
+        String realPassword = "";
+
+        try {
+            //if file exists, create scanner for file
+            if (f.exists() == true) {
+                Scanner s = new Scanner(f);
+
+                //Find password in file, determine if password equal
+                realPassword = s.nextLine();
+
+                if (password.equals(realPassword)) {
+                    loggedIn = true;
+                    return loggedIn;
+                }
+
+            } else {//Create a new file for user
+                String newPassword = "";
+                Scanner pass = new Scanner(System.in);
+                PrintWriter newUser = new PrintWriter(username + ".txt");;
+                newUser.println(password);
+                newUser.println(0);
+                newUser.println(false);
+                newUser.println("");
+                for (int nums = 0; nums < 7; nums++) {
+                    newUser.println(0);
+                }
+                newUser.close();
+                loggedIn = true;
+                return loggedIn;
+
+            }
+            return loggedIn;
+        } catch (IOException e) {
+            System.out.println("Something went wrong. EXITING...");
+            System.exit(0);
         }
         return loggedIn;
     }
@@ -166,6 +201,7 @@ public class VirtualPet {
                 lumps += LUMPSMAXTILES - (tries - 5) * 4;
                 System.out.println("You win!! You now have " + lumps + " lumps.");
                 tilesWin = true;
+                break;
             }
         }
 
@@ -231,11 +267,6 @@ public class VirtualPet {
         Random rd = new Random();
 
         //CONSTANTS//
-        //For login 
-        final int LOGINATTEMPTS = 3;
-        final String PETUSER = "snoopy";
-        final String PETPASSWORD = "toto";
-
         //For naming 
         final int PETNAMEMAXLENGTH = 8;
         final int DOUBLEVOWELLENGTH = 6;
@@ -248,29 +279,29 @@ public class VirtualPet {
         //For game 1 
         final int GUESSMAX = 5;
         final int LUMPSMULTIPLIERGUESS = 3;
-
         //VARIABLES// 
-        boolean startMenu = false;
-        boolean generatePet = false;
-        int startScreenOption = 0;
+
+        //Read from file 
         int sharkChoice = 0;
-
-        //For login 
-        String username = "";
-        String password = "";
-
-        //For naming
-        int naming = 0;
+        boolean generatePet = false;
         String petName = "";
-
-        //For stats 
         int petMaxHealth = 0;
         int petMaxFood = 0;
         int petMaxEnergy = 0;
-
         int petHealth = 0;
         int petFood = 0;
         int petEnergy = 0;
+
+        //For login 
+        boolean startMenu = false;
+        String username = "";
+        String password = "";
+
+        //Which screen on menu
+        int startScreenOption = 0;
+
+        //For naming
+        int naming = 0;
 
         //For playing game 1 
         int playGame = 0;
@@ -314,9 +345,15 @@ public class VirtualPet {
         //Login Menu 
         while (startMenu == false) {
             username = JOptionPane.showInputDialog(null, "Enter your username:");
-            password = JOptionPane.showInputDialog(null, "Enter your password:");
+            File temporary = new File(username + ".txt");
 
-            startMenu = correctLogin(username, password, PETUSER, PETPASSWORD);
+            if (temporary.exists()) {
+                password = JOptionPane.showInputDialog(null, "Enter your password:");
+            }
+            else {
+                password = JOptionPane.showInputDialog(null, "Welcome new user! Enter a new password: ");
+            }
+            startMenu = correctLogin(username, password);
 
             //If invalid username / password 
             if (startMenu == false) {
@@ -324,10 +361,41 @@ public class VirtualPet {
             }
         }
 
+        //Variables taken from file
+        File pet = new File(username + ".txt");
+
+        try {
+            Scanner sc = new Scanner(pet);
+            sc.nextLine(); // to skip password
+            sharkChoice = sc.nextInt();
+            sc.nextLine(); //to clear cache, move onto next line
+            generatePet = sc.nextBoolean();
+            sc.nextLine();
+            petName = sc.nextLine();
+            petMaxHealth = sc.nextInt();
+            sc.nextLine();
+            petMaxFood = sc.nextInt();
+            sc.nextLine();
+            petMaxEnergy = sc.nextInt();
+            sc.nextLine();
+            petHealth = sc.nextInt();
+            sc.nextLine();
+            petFood = sc.nextInt();
+            sc.nextLine();
+            petEnergy = sc.nextInt();
+            sc.nextLine();
+            lumps = sc.nextInt();
+            sc.close();
+
+        } catch (IOException e) { // If error occurs while reading
+            System.out.println("Could not successfully read user file. Exiting...");
+            System.exit(0);
+        }
+
         JOptionPane.showMessageDialog(null, "Successful login! Please select an option from the menu: ");
 
+        //START MENU//
         while (startMenu == true) {
-            //START MENU//
 
             //First time start menu 
             if (generatePet == false) {
@@ -362,6 +430,9 @@ public class VirtualPet {
                             JOptionPane.showMessageDialog(null, "CONFIRM WHALE SHARK");
                             break;
                     }
+                } else {
+                    System.out.println("Invalid selection. Returning to menu...");
+                    continue;
                 }
 
                 //Determine whether to input name or generate random name 
@@ -371,15 +442,15 @@ public class VirtualPet {
                 //Input a pets name 
                 if (naming == 1) {
                     System.out.println("Enter your pet's name: ");
-                    petName = kb.nextLine(); //To clear cache
+                    kb.nextLine(); //To clear cache
                     petName = kb.nextLine(); //Actual input of name
                 } //Generating a pets name 
                 else if (naming == 2) {
                     petName = nameGenerator((PETNAMEMAXLENGTH - (rd.nextInt(4))), DOUBLEVOWELLENGTH, CONSONANTS, VOWELS);
                 } //Invalid input for inputting name 
                 else {
-                    System.out.println("Invalid input ");
-                    System.exit(0);
+                    System.out.println("Invalid input. Returning to menu...");
+                    continue;
                 }
 
                 //Display pet name 
@@ -472,16 +543,36 @@ public class VirtualPet {
 
                 } else {
                     System.out.println("Invalid input.");
-                    System.exit(0);
                 }
 
             } //Open the instruction menu 
             else if (startScreenOption == 2) {
                 System.out.println("INSTRUCTION MENU");
-            } //Exit the program
+            } //Exit the program after saving all user data
             else if (startScreenOption == 3) {
                 System.out.println("EXITING...");
-                System.exit(0);
+
+                try {
+                    File fl = new File(username + ".txt");
+                    PrintWriter pr = new PrintWriter(fl);
+                    pr.println(password);
+                    pr.println(sharkChoice);
+                    pr.println(generatePet);
+                    pr.println(petName);
+                    pr.println(petMaxHealth);
+                    pr.println(petMaxFood);
+                    pr.println(petMaxEnergy);
+                    pr.println(petHealth);
+                    pr.println(petFood);
+                    pr.println(petEnergy);
+                    pr.println(lumps);
+                    pr.close();
+
+                    System.exit(0);
+                } catch (IOException e) {
+                    System.out.println("An error has occured while saving your file. Data is unable to be saved.");
+                    System.exit(0);
+                }
             } //If invalid input for start menu
             else {
                 System.out.println("Invalid input. Please try again.");
