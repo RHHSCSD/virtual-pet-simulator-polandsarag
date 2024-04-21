@@ -194,14 +194,14 @@ public class VirtualPet {
                 System.out.println("Incorrect!");
             }
 
-            System.out.println("You have " + (TRIESMAX - tries) + " guesses left. ");
-
             //If the user guesses all the pairs, give them corresponding number of lumps 
             if (correctGuess == CORRECTWINS) {
                 lumps += LUMPSMAXTILES - (tries - 5) * 4;
                 System.out.println("You win!! You now have " + lumps + " lumps.");
                 tilesWin = true;
                 break;
+            } else {
+                System.out.println("You have " + (TRIESMAX - tries) + " guesses left. ");
             }
         }
 
@@ -275,6 +275,7 @@ public class VirtualPet {
 
         //For pet stats 
         final int TOTALPETSTATS = 20;
+        final int STATNUM = 3;
 
         //For game 1 
         final int GUESSMAX = 5;
@@ -285,12 +286,6 @@ public class VirtualPet {
         int sharkChoice = 0;
         boolean generatePet = false;
         String petName = "";
-        int petMaxHealth = 0;
-        int petMaxFood = 0;
-        int petMaxEnergy = 0;
-        int petHealth = 0;
-        int petFood = 0;
-        int petEnergy = 0;
 
         //For login 
         boolean startMenu = false;
@@ -309,6 +304,8 @@ public class VirtualPet {
         int guessedNumber = 0;
 
         //For Pet Interaction 
+        int[] maxStats = new int[3];
+        int[] currentStats = new int[3];
         int petAction = 0;
 
         // Start screen setup 
@@ -327,7 +324,7 @@ public class VirtualPet {
                                        -::::--:-:####+++---=-===+==+**=-=+++*----::-:..::------..           
                                         =-..::-:::--:+++:=-:-=-===+:-+:*-=-:==+-::.-----::---=-.            
                                          =:  ^^ __::.::::.:::-:::::::::::==---:.:....-: .  ....             
-                                           -::...--:::::::-:--:--.:::::::-:::......:-                       
+                                           -::...--:::::::-:--:--.:::::::-:::......-X                       
                                             =-:::....::.:-:.:::::::.::::::::......-                         
                                           ##+#*-:...::..::..:::..:...........-= --                          
                                    #######*#**##  =.....:. ....::..... ... ..=                              
@@ -349,8 +346,7 @@ public class VirtualPet {
 
             if (temporary.exists()) {
                 password = JOptionPane.showInputDialog(null, "Enter your password:");
-            }
-            else {
+            } else {
                 password = JOptionPane.showInputDialog(null, "Welcome new user! Enter a new password: ");
             }
             startMenu = correctLogin(username, password);
@@ -372,18 +368,17 @@ public class VirtualPet {
             generatePet = sc.nextBoolean();
             sc.nextLine();
             petName = sc.nextLine();
-            petMaxHealth = sc.nextInt();
-            sc.nextLine();
-            petMaxFood = sc.nextInt();
-            sc.nextLine();
-            petMaxEnergy = sc.nextInt();
-            sc.nextLine();
-            petHealth = sc.nextInt();
-            sc.nextLine();
-            petFood = sc.nextInt();
-            sc.nextLine();
-            petEnergy = sc.nextInt();
-            sc.nextLine();
+
+            //bring in max health, food, energy respectively
+            for (int statNum = 0; statNum < STATNUM; statNum++) {
+                maxStats[statNum] = sc.nextInt();
+                sc.nextLine();
+            }
+            //bring in current health, food, energy respectively
+            for (int statNum = 0; statNum < STATNUM; statNum++) {
+                currentStats[statNum] = sc.nextInt();
+                sc.nextLine();
+            }
             lumps = sc.nextInt();
             sc.close();
 
@@ -457,13 +452,13 @@ public class VirtualPet {
                 System.out.println("Your pet, named " + petName + ", has been born!");
 
                 //Determine pet stats 
-                petMaxHealth = rd.nextInt(17) + 1;
-                petMaxFood = rd.nextInt((TOTALPETSTATS - petMaxHealth - 1)) + 1;
-                petMaxEnergy = TOTALPETSTATS - petMaxHealth - petMaxFood;
-                System.out.println("Your max health is " + petMaxHealth + ", your max food is " + petMaxFood + ", and your max energy is " + petMaxEnergy);
-                petHealth = petMaxHealth;
-                petFood = petMaxFood;
-                petEnergy = petMaxEnergy;
+                maxStats[0] = rd.nextInt(17) + 1; // pet max health
+                maxStats[1] = rd.nextInt((TOTALPETSTATS - maxStats[0] - 1)) + 1; // pet max food 
+                maxStats[2] = TOTALPETSTATS - maxStats[0] - maxStats[1]; // pet max energy 
+                System.out.println("Your max health is " + maxStats[0] + ", your max food is " + maxStats[1] + ", and your max energy is " + maxStats[2]);
+                currentStats[0] = maxStats[0];
+                currentStats[1] = maxStats[1];
+                currentStats[2] = maxStats[2];
 
                 //Allow interaction with pet 
                 generatePet = true;
@@ -513,24 +508,24 @@ public class VirtualPet {
                     petAction = Integer.parseInt(JOptionPane.showInputDialog(null, "Would you like to play with your pet (1), feed your pet (2), groom your pet(3), or exit out of interaction (4)?"));
                     switch (petAction) {
                         case 1:
-                            if (petEnergy < petMaxEnergy) {
-                                petPlay(petMaxEnergy, petEnergy);
+                            if (currentStats[2] < maxStats[2]) {
+                                petPlay(maxStats[2], currentStats[2]);
                             } else {
                                 System.out.println("Pet energy already maxed!");
                             }
                             break;
                         case 2:
-                            if (petFood < petMaxFood) {
-                                petFeed(petMaxFood, petFood);
+                            if (currentStats[1] < maxStats[1]) {
+                                petFeed(maxStats[1], currentStats[1]);
                             } else {
                                 System.out.println("Pet hunger already maxed!");
                             }
                             break;
                         case 3:
-                            if (petHealth < petMaxHealth) {
-                                petGroom(petMaxHealth, petHealth);
+                            if (currentStats[0] < maxStats[0]) {
+                                petGroom(maxStats[0], currentStats[0]);
                             } else {
-                                System.out.println("Pet heealth already maxed!");
+                                System.out.println("Pet health already maxed!");
                             }
                             break;
                         case 4:
@@ -559,12 +554,12 @@ public class VirtualPet {
                     pr.println(sharkChoice);
                     pr.println(generatePet);
                     pr.println(petName);
-                    pr.println(petMaxHealth);
-                    pr.println(petMaxFood);
-                    pr.println(petMaxEnergy);
-                    pr.println(petHealth);
-                    pr.println(petFood);
-                    pr.println(petEnergy);
+                    pr.println(maxStats[0]);
+                    pr.println(maxStats[1]);
+                    pr.println(maxStats[2]);
+                    pr.println(currentStats[0]);
+                    pr.println(currentStats[1]);
+                    pr.println(currentStats[2]);
                     pr.println(lumps);
                     pr.close();
 
